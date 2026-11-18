@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "dev.kris.proxymod.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "client": [
+    "ConnectionMixin",
+    "ServerNameResolverMixin",
+    "ServerStatusPingerMixin",
+    "JoinMultiplayerScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

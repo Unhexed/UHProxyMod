@@ -1,0 +1,78 @@
+plugins {
+    id 'net.fabricmc.fabric-loom' version "${loom_version}"
+}
+
+version = "${mod_version}+mc${minecraft_version}"
+group = project.maven_group
+
+repositories {
+    mavenCentral()
+}
+
+sourceSets {
+    smokeTest {
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${minecraft_version}"
+    implementation "net.fabricmc:fabric-loader:${loader_version}"
+
+    // Minecraft supplies the remaining Netty modules. Bundle only these two.
+    include implementation("io.netty:netty-handler-proxy:${netty_version}")
+    include implementation("io.netty:netty-codec-socks:${netty_version}")
+
+    testImplementation platform('org.junit:junit-bom:5.14.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+loom {
+    mods {
+        proxy_mod { sourceSet sourceSets.main }
+        proxy_mod_smoke { sourceSet sourceSets.smokeTest }
+    }
+    runs {
+        client {
+            client()
+            setConfigName('Proxy Mod Client')
+            runDir('run')
+        }
+        smokeTest {
+            client()
+            source sourceSets.smokeTest
+            setConfigName('Proxy Mod Smoke Test')
+            runDir('run/smoke-test')
+            programArgs '--username', 'ProxySmoke', '--width', '854', '--height', '480'
+        }
+    }
+}
+
+processResources {
+    def modVersion = project.version.toString()
+    inputs.property 'version', modVersion
+    filesMatching('fabric.mod.json') {
+        expand version: modVersion
+    }
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(25)
+    withSourcesJar()
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 25
+}
+
+test {
+    useJUnitPlatform()
+    testLogging { events 'passed', 'skipped', 'failed' }
+}
+
+jar {
+    from('LICENSE') { rename { "${it}_proxy-mod" } }
+}

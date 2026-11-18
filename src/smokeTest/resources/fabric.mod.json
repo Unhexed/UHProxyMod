@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "id": "proxy_mod_smoke",
+  "version": "1.0.0",
+  "name": "Proxy Mod development smoke test",
+  "environment": "client",
+  "mixins": ["proxy-mod-smoke.mixins.json"],
+  "depends": { "proxy_mod": "*" }
+}
